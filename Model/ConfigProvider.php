@@ -199,7 +199,7 @@ class ConfigProvider implements ConfigProviderInterface
     {
         return [
             '' => __('Please, select a pocket.'),
-            '1' => __('Main account and Home renovation'),
+            '1' => __('Main account'),
             '3' => __('Active Hungarians'),
         ];
     }
@@ -213,7 +213,6 @@ class ConfigProvider implements ConfigProviderInterface
             '' => __('Please, select a pocket.'),
             '1111' => __('Main account'),
             '3333' => __('Active Hungarians'),
-            '4444' => __('Home renovation'),
         ];
     }
 
@@ -224,7 +223,7 @@ class ConfigProvider implements ConfigProviderInterface
     {
         return [
             '' => __('Please, select a pocket.'),
-            '09' => __('Main account and Home renovation'),
+            '09' => __('Main account'),
             '08' => __('Active Hungarians'),
         ];
     }
