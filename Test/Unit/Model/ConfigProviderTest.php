@@ -246,10 +246,10 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
 
         $result = $configProvider->getMkbCardPocketId();
 
-        $this->assertEquals(4, count($result));
+        $this->assertEquals(3, count($result));
 
         $this->assertEquals([
-            '', '1111', '3333', '4444'
+            '', '1111', '3333'
         ], array_keys($result));
     }
 

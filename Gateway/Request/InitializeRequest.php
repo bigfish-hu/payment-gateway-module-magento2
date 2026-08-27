@@ -257,8 +257,16 @@ class InitializeRequest implements BuilderInterface
         }
 
         if ($providerConfig['name'] == ConfigProvider::CODE_MKB_SZEP) {
+            $cardPocketId = $providerConfig['card_pocket_id'];
+
+            // The Home renovation pocket ('4444') has been phased out; redirect
+            // this legacy config value to the Main account ('1111').
+            if ((string)$cardPocketId === '4444') {
+                $cardPocketId = '1111';
+            }
+
             $request
-                ->setMkbSzepCafeteriaId($providerConfig['card_pocket_id'])
+                ->setMkbSzepCafeteriaId($cardPocketId)
                 ->setGatewayPaymentPage(true);
         }
 
