@@ -453,7 +453,7 @@ class InitializeRequestTest extends \PHPUnit_Framework_TestCase
         $expectedInitRequest = $this->getExpectedInitRequest();
 
         $expectedInitRequest->providerName = 'MKBSZEP';
-        $expectedInitRequest->mkbSzepCafeteriaId = 10;
+        $expectedInitRequest->mkbSzepCafeteriaId = '1111';
         $expectedInitRequest->gatewayPaymentPage = true;
 
         $response = $this->createResponse([
@@ -470,7 +470,7 @@ class InitializeRequestTest extends \PHPUnit_Framework_TestCase
             'apikey' => 'test_apikey',
             'provider_code' => 'MKBSZEP',
             'response_url' => '/test_response_url',
-            'card_pocket_id' => 10,
+            'card_pocket_id' => '1111',
             'testmode' => 1,
             'active' => 1,
             'debug' => 1,
@@ -499,6 +499,117 @@ class InitializeRequestTest extends \PHPUnit_Framework_TestCase
             'payment' => $this->paymentDataObjectMock,
         ]));
 
+    }
+
+    /**
+     * @test
+     */
+    public function mkbSzepDeprecatedPocketFallsBackToMainAccountTest()
+    {
+        $expectedInitRequest = $this->getExpectedInitRequest();
+
+        $expectedInitRequest->providerName = 'MKBSZEP';
+        // The deprecated Home renovation pocket ('4444') must be redirected to Main account ('1111').
+        $expectedInitRequest->mkbSzepCafeteriaId = '1111';
+        $expectedInitRequest->gatewayPaymentPage = true;
+
+        $response = $this->createResponse([
+            'ResultCode' => PaymentGateway::RESULT_CODE_SUCCESS,
+            'TransactionId' => $this->transactionId,
+        ]);
+
+        $this->setSuccessfulRequestCommon($expectedInitRequest, $response);
+
+        $code = 'bigfishpaymentgateway_pmgw_mkbszep';
+        $config = [
+            'name' => 'bigfishpaymentgateway_pmgw_mkbszep',
+            'storename' => 'test_storename',
+            'apikey' => 'test_apikey',
+            'provider_code' => 'MKBSZEP',
+            'response_url' => '/test_response_url',
+            'card_pocket_id' => '4444',
+            'testmode' => 1,
+            'active' => 1,
+            'debug' => 1,
+        ];
+
+        $this->setPaymentMethodMockGetCode($code);
+        $this->setConfigProviderMockGetProviderConfig($code, $config);
+
+        $initializeRequest = new InitializeRequest(
+            $this->configProviderMock,
+            $this->storeManagerMock,
+            $this->productMetaDataMock,
+            $this->moduleListMock,
+            $this->helperMock,
+            $this->loggerMock,
+            $this->dateTimeMock,
+            $this->scopeConfigMock,
+            $this->paymentInterfacedMock,
+            $this->inputParamsResolverMock
+        );
+
+        $this->assertEquals([
+            'ResultCode' => 'SUCCESSFUL',
+            'TransactionId' => $this->transactionId,
+        ], $initializeRequest->build([
+            'payment' => $this->paymentDataObjectMock,
+        ]));
+    }
+
+    /**
+     * @test
+     */
+    public function mkbSzepUnknownPocketIsNotSilentlyRemappedTest()
+    {
+        $expectedInitRequest = $this->getExpectedInitRequest();
+
+        $expectedInitRequest->providerName = 'MKBSZEP';
+        $expectedInitRequest->mkbSzepCafeteriaId = '9999';
+        $expectedInitRequest->gatewayPaymentPage = true;
+
+        $response = $this->createResponse([
+            'ResultCode' => PaymentGateway::RESULT_CODE_SUCCESS,
+            'TransactionId' => $this->transactionId,
+        ]);
+
+        $this->setSuccessfulRequestCommon($expectedInitRequest, $response);
+
+        $code = 'bigfishpaymentgateway_pmgw_mkbszep';
+        $config = [
+            'name' => 'bigfishpaymentgateway_pmgw_mkbszep',
+            'storename' => 'test_storename',
+            'apikey' => 'test_apikey',
+            'provider_code' => 'MKBSZEP',
+            'response_url' => '/test_response_url',
+            'card_pocket_id' => '9999',
+            'testmode' => 1,
+            'active' => 1,
+            'debug' => 1,
+        ];
+
+        $this->setPaymentMethodMockGetCode($code);
+        $this->setConfigProviderMockGetProviderConfig($code, $config);
+
+        $initializeRequest = new InitializeRequest(
+            $this->configProviderMock,
+            $this->storeManagerMock,
+            $this->productMetaDataMock,
+            $this->moduleListMock,
+            $this->helperMock,
+            $this->loggerMock,
+            $this->dateTimeMock,
+            $this->scopeConfigMock,
+            $this->paymentInterfacedMock,
+            $this->inputParamsResolverMock
+        );
+
+        $this->assertEquals([
+            'ResultCode' => 'SUCCESSFUL',
+            'TransactionId' => $this->transactionId,
+        ], $initializeRequest->build([
+            'payment' => $this->paymentDataObjectMock,
+        ]));
     }
 
     /**
